@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>HSH Endpoint Test</title>
+<style>
+/* Layout: single narrow column, one primary button, three result rows, one verdict line. Utilitarian test page. */
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --fg: #1d1b16;
+  --muted: #6b665b;
+  --line: #dcd8cc;
+  --accent: #8a6a12;
+  --accent-fg: #ffffff;
+  --ok: #1f7a3d;
+  --ok-bg: #e3f3e8;
+  --bad: #b3261e;
+  --bad-bg: #fbe6e4;
+  --wait: #6b665b;
+  --wait-bg: #ecebe4;
+  --font-body: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17150f; --surface: #221f17; --fg: #efece1; --muted: #a29b88; --line: #3a3628;
+    --accent: #e0b84a; --accent-fg: #1d1b16;
+    --ok: #6fd08a; --ok-bg: #1d3524; --bad: #ff8c84; --bad-bg: #3d1f1c; --wait: #a29b88; --wait-bg: #2c2920;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17150f; --surface: #221f17; --fg: #efece1; --muted: #a29b88; --line: #3a3628;
+  --accent: #e0b84a; --accent-fg: #1d1b16;
+  --ok: #6fd08a; --ok-bg: #1d3524; --bad: #ff8c84; --bad-bg: #3d1f1c; --wait: #a29b88; --wait-bg: #2c2920;
+  color-scheme: dark;
+}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 24px 40px; }
+main { max-width: 34rem; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
+h1 { font-size: 1.35rem; font-weight: 600; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.lead { color: var(--muted); }
+button { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 6px; padding: 14px 16px; cursor: pointer; width: 100%; }
+button:disabled { opacity: .6; cursor: default; }
+button.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); font-weight: 500; padding: 10px 14px; width: auto; }
+button:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+.rows { display: flex; flex-direction: column; gap: 10px; }
+.row { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.row-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.name { font-weight: 600; }
+.pill { font-family: var(--font-data); font-size: .78rem; padding: 2px 8px; border-radius: 99px; background: var(--wait-bg); color: var(--wait); }
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.url, .detail { font-family: var(--font-data); font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; }
+.detail { color: var(--fg); }
+.verdict { border-radius: 6px; padding: 12px 14px; background: var(--wait-bg); color: var(--fg); }
+.verdict.ok { background: var(--ok-bg); }
+.verdict.bad { background: var(--bad-bg); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.note { font-size: .85rem; color: var(--muted); }
+</style>
+
+<main>
+  <h1>ทดสอบเรียก endpoint ของฮั่วเซ่งเฮงจากหน้า artifact</h1>
+  <p class="lead">กดปุ่มเดียวเพื่อเรียก 3 endpoint จากเบราว์เซอร์ของคุณ ดูว่าอ่านผลได้หรือถูกบล็อก ผลจะถูกเก็บไว้ 5 นาที กดซ้ำในช่วงนั้นจะไม่ยิงใหม่</p>
+
+  <button id="run" type="button">ทดสอบ</button>
+
+  <div id="verdict" class="verdict" aria-live="polite">ยังไม่ได้ทดสอบ</div>
+
+  <div class="rows" id="rows">
+    <div class="row" id="r0">
+      <div class="row-head"><span class="name">ราคาทองแท่ง 96.5% (HSH)</span><span class="pill" data-pill>รอ</span></div>
+      <div class="url">apicheckpricev3.huasengheng.com/api/values/getprice/</div>
+      <div class="detail" data-detail>-</div>
+    </div>
+    <div class="row" id="r1">
+      <div class="row-head"><span class="name">สถานะตลาด</span><span class="pill" data-pill>รอ</span></div>
+      <div class="url">apicheckpricev3.huasengheng.com/api/values/GetMarketStatus</div>
+      <div class="detail" data-detail>-</div>
+    </div>
+    <div class="row" id="r2">
+      <div class="row-head"><span class="name">ทองคำ 99.99%</span><span class="pill" data-pill>รอ</span></div>
+      <div class="url">apigoldprice99.huasengheng.com/api/values</div>
+      <div class="detail" data-detail>-</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="copy" type="button" class="ghost" hidden>คัดลอกผล</button>
+    <span id="copied" class="note" aria-live="polite"></span>
+  </div>
+
+  <p class="note">endpoint เหล่านี้ไม่ใช่ API ทางการของฮั่วเซ่งเฮง อาจเปลี่ยนหรือปิดได้โดยไม่แจ้ง ถ้าขึ้นว่าเรียกไม่ได้ จากหน้านี้แยกไม่ได้ว่าถูกบล็อกโดยหน้า artifact หรือโดยเซิร์ฟเวอร์ปลายทาง</p>
+</main>
+
+<script>
+(function () {
+  var ENDPOINTS = [
+    { url: "https://apicheckpricev3.huasengheng.com/api/values/getprice/", kind: "price" },
+    { url: "https://apicheckpricev3.huasengheng.com/api/values/GetMarketStatus", kind: "market" },
+    { url: "https://apigoldprice99.huasengheng.com/api/values", kind: "gold9999" }
+  ];
+  var COOLDOWN_MS = 5 * 60 * 1000;
+  var lastRun = 0;
+  var lastReport = "";
+  var runBtn = document.getElementById("run");
+  var copyBtn = document.getElementById("copy");
+  var verdict = document.getElementById("verdict");
+
+  function setRow(i, state, text) {
+    var row = document.getElementById("r" + i);
+    var pill = row.querySelector("[data-pill]");
+    pill.className = "pill" + (state === "ok" ? " ok" : state === "bad" ? " bad" : "");
+    pill.textContent = state === "ok" ? "อ่านได้" : state === "bad" ? "เรียกไม่ได้" : "กำลังเรียก";
+    row.querySelector("[data-detail]").textContent = text;
+  }
+
+  function summarize(kind, data) {
+    try {
+      if (kind === "price") {
+        var arr = Array.isArray(data) ? data : [];
+        var h = arr.filter(function (x) { return x && x.GoldType === "HSH"; })[0];
+        if (!h) return "อ่านได้ แต่ไม่พบรายการ HSH ในผล (รูปแบบอาจเปลี่ยน) จำนวนรายการ: " + arr.length;
+        return "รับซื้อ " + h.Buy + " · ขายออก " + h.Sell + " · อัปเดต " + (h.StrTimeUpdate || h.TimeUpdate);
+      }
+      if (kind === "market") {
+        return "MarketStatus: " + (data && data.MarketStatus);
+      }
+      if (kind === "gold9999") {
+        var d = Array.isArray(data) ? data[0] : data;
+        return "รับซื้อ " + (d && d.Buy) + " · ขายออก " + (d && d.Sell) + " · อัปเดต " + (d && d.TimeUpdate);
+      }
+    } catch (e) {}
+    return "อ่านได้ แต่แปลงผลไม่ได้";
+  }
+
+  async function callOne(ep, i) {
+    var t0 = performance.now();
+    try {
+      var res = await fetch(ep.url, { method: "GET", cache: "no-store" });
+      var ms = Math.round(performance.now() - t0);
+      if (!res.ok) {
+        setRow(i, "bad", "เซิร์ฟเวอร์ตอบ HTTP " + res.status + " (" + ms + " ms)");
+        return { ok: false, line: ep.url + " → HTTP " + res.status };
+      }
+      var data = await res.json();
+      var s = summarize(ep.kind, data);
+      setRow(i, "ok", s + " (" + ms + " ms)");
+      return { ok: true, line: ep.url + " → OK " + s };
+    } catch (e) {
+      var ms2 = Math.round(performance.now() - t0);
+      var msg = (e && e.name ? e.name : "Error") + ": " + (e && e.message ? e.message : "") + " (" + ms2 + " ms)";
+      setRow(i, "bad", msg);
+      return { ok: false, line: ep.url + " → FAIL " + msg };
+    }
+  }
+
+  async function run() {
+    var now = Date.now();
+    if (lastRun && now - lastRun < COOLDOWN_MS) {
+      var left = Math.ceil((COOLDOWN_MS - (now - lastRun)) / 1000);
+      verdict.textContent = "แสดงผลที่เก็บไว้ (ยิงใหม่ได้อีก " + left + " วินาที)";
+      return;
+    }
+    lastRun = now;
+    runBtn.disabled = true;
+    verdict.className = "verdict";
+    verdict.textContent = "กำลังทดสอบ...";
+    for (var i = 0; i < ENDPOINTS.length; i++) setRow(i, "wait", "-");
+    var results = await Promise.all(ENDPOINTS.map(callOne));
+    var okCount = results.filter(function (r) { return r.ok; }).length;
+    if (okCount === results.length) {
+      verdict.className = "verdict ok";
+      verdict.textContent = "ผ่านทั้ง 3 endpoint หน้า artifact เรียกข้ามโดเมนไปฮั่วเซ่งเฮงได้";
+    } else if (okCount === 0) {
+      verdict.className = "verdict bad";
+      verdict.textContent = "ไม่ผ่านทั้ง 3 endpoint หน้า artifact เรียกไม่ได้ ต้องใช้ที่โฮสต์อื่นหรือมีตัวกลาง";
+    } else {
+      verdict.className = "verdict bad";
+      verdict.textContent = "ผ่าน " + okCount + " จาก 3 endpoint ดูรายละเอียดด้านล่าง";
+    }
+    lastReport = "ทดสอบ " + new Date().toISOString() + "\n" + results.map(function (r) { return r.line; }).join("\n");
+    copyBtn.hidden = false;
+    runBtn.disabled = false;
+  }
+
+  runBtn.addEventListener("click", run);
+
+  copyBtn.addEventListener("click", function () {
+    var out = document.getElementById("copied");
+    function fallback() { out.textContent = "คัดลอกไม่ได้ในหน้านี้ ให้จดผลด้านบนแทน"; }
+    try {
+      navigator.clipboard.writeText(lastReport).then(function () { out.textContent = "คัดลอกแล้ว"; }, fallback);
+    } catch (e) { fallback(); }
+  });
+})();
+</script>
+
+</body>
+</html>
