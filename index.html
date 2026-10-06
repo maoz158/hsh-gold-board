@@ -3,207 +3,413 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style>
-</head>
-<body>
-<title>HSH Endpoint Test</title>
+<meta name="color-scheme" content="light dark">
+<title>HSH Gold Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
 <style>
-/* Layout: single narrow column, one primary button, three result rows, one verdict line. Utilitarian test page. */
+/* Layout: one narrow column for a phone. Header with market chip, one big button, two price cards (96.5% large, 99.99% small), notices, footer. */
 :root {
-  --bg: #f6f5f1;
+  --bg: #eef0f3;
   --surface: #ffffff;
-  --fg: #1d1b16;
-  --muted: #6b665b;
-  --line: #dcd8cc;
-  --accent: #8a6a12;
-  --accent-fg: #ffffff;
-  --ok: #1f7a3d;
-  --ok-bg: #e3f3e8;
-  --bad: #b3261e;
-  --bad-bg: #fbe6e4;
-  --wait: #6b665b;
-  --wait-bg: #ecebe4;
+  --fg: #15181e;
+  --muted: #5d6573;
+  --line: #d6dae1;
+  --gold: #8f6a0a;
+  --gold-fg: #ffffff;
+  --up: #17753a;
+  --down: #b3261e;
+  --ok-bg: #dff1e5;
+  --ok-fg: #17753a;
+  --off-bg: #e3e6eb;
+  --off-fg: #4a5160;
+  --warn-bg: #fbefd2;
+  --warn-fg: #6b4a00;
+  --err-bg: #fbe3e0;
+  --err-fg: #8f1d16;
+  --info-bg: #e3e9f4;
+  --info-fg: #2c3f66;
   --font-body: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif;
-  --font-data: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --font-num: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #17150f; --surface: #221f17; --fg: #efece1; --muted: #a29b88; --line: #3a3628;
-    --accent: #e0b84a; --accent-fg: #1d1b16;
-    --ok: #6fd08a; --ok-bg: #1d3524; --bad: #ff8c84; --bad-bg: #3d1f1c; --wait: #a29b88; --wait-bg: #2c2920;
+    --bg: #0f1216; --surface: #181c22; --fg: #ebe8de; --muted: #9aa1ad; --line: #2c323b;
+    --gold: #e3b341; --gold-fg: #14110a; --up: #5fd388; --down: #ff8a80;
+    --ok-bg: #173324; --ok-fg: #7fe0a0; --off-bg: #262b33; --off-fg: #aab1bd;
+    --warn-bg: #3a2f10; --warn-fg: #f1cf74; --err-bg: #3d1f1c; --err-fg: #ffaaa2;
+    --info-bg: #1e2a40; --info-fg: #a9c2f2;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #17150f; --surface: #221f17; --fg: #efece1; --muted: #a29b88; --line: #3a3628;
-  --accent: #e0b84a; --accent-fg: #1d1b16;
-  --ok: #6fd08a; --ok-bg: #1d3524; --bad: #ff8c84; --bad-bg: #3d1f1c; --wait: #a29b88; --wait-bg: #2c2920;
+  --bg: #0f1216; --surface: #181c22; --fg: #ebe8de; --muted: #9aa1ad; --line: #2c323b;
+  --gold: #e3b341; --gold-fg: #14110a; --up: #5fd388; --down: #ff8a80;
+  --ok-bg: #173324; --ok-fg: #7fe0a0; --off-bg: #262b33; --off-fg: #aab1bd;
+  --warn-bg: #3a2f10; --warn-fg: #f1cf74; --err-bg: #3d1f1c; --err-fg: #ffaaa2;
+  --info-bg: #1e2a40; --info-fg: #a9c2f2;
   color-scheme: dark;
 }
-</style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
-<style>
-body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 24px 40px; }
-main { max-width: 34rem; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
-h1 { font-size: 1.35rem; font-weight: 600; margin: 0; text-wrap: balance; }
-p { margin: 0; }
-.lead { color: var(--muted); }
-button { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 6px; padding: 14px 16px; cursor: pointer; width: 100%; }
-button:disabled { opacity: .6; cursor: default; }
-button.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); font-weight: 500; padding: 10px 14px; width: auto; }
-button:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
-.rows { display: flex; flex-direction: column; gap: 10px; }
-.row { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.row-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-.name { font-weight: 600; }
-.pill { font-family: var(--font-data); font-size: .78rem; padding: 2px 8px; border-radius: 99px; background: var(--wait-bg); color: var(--wait); }
-.pill.ok { background: var(--ok-bg); color: var(--ok); }
-.pill.bad { background: var(--bad-bg); color: var(--bad); }
-.url, .detail { font-family: var(--font-data); font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; }
-.detail { color: var(--fg); }
-.verdict { border-radius: 6px; padding: 12px 14px; background: var(--wait-bg); color: var(--fg); }
-.verdict.ok { background: var(--ok-bg); }
-.verdict.bad { background: var(--bad-bg); }
-.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.note { font-size: .85rem; color: var(--muted); }
-</style>
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-inline: 16px;
+  padding-block: max(20px, env(safe-area-inset-top, 0px)) max(32px, env(safe-area-inset-bottom, 0px));
+}
+main { max-width: 30rem; margin-inline: auto; display: flex; flex-direction: column; gap: 14px; }
+h1, h2, p { margin: 0; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: 1.15rem; font-weight: 600; letter-spacing: .01em; }
+.sub { color: var(--muted); font-size: .82rem; }
+.chip { font-size: .8rem; font-weight: 600; padding: 3px 10px; border-radius: 99px; background: var(--off-bg); color: var(--off-fg); white-space: nowrap; }
+.chip[data-state="on"] { background: var(--ok-bg); color: var(--ok-fg); }
 
+button#go {
+  font: inherit; font-weight: 600; font-size: 1.05rem;
+  background: var(--gold); color: var(--gold-fg);
+  border: 0; border-radius: 8px; padding: 15px 16px; width: 100%; cursor: pointer;
+}
+button#go:disabled { opacity: .55; cursor: default; }
+button#go:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+.status { font-size: .82rem; color: var(--muted); min-height: 1.3em; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card h2 { font-size: .95rem; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+.card h2 .tag { font-weight: 400; font-size: .78rem; color: var(--muted); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cell { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.lbl { font-size: .78rem; color: var(--muted); letter-spacing: .02em; }
+.num { font-family: var(--font-num); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 1.7rem; line-height: 1.15; overflow-wrap: anywhere; }
+.card.small .num { font-size: 1.3rem; }
+.chg { font-family: var(--font-num); font-size: .85rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.chg.up { color: var(--up); }
+.chg.down { color: var(--down); }
+.meta { font-size: .8rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 2px; }
+.meta .stale { color: var(--down); font-weight: 600; }
+.ref { font-size: .8rem; color: var(--muted); }
+.ref span.n { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--fg); }
+
+#notices { display: flex; flex-direction: column; gap: 8px; }
+.note { border-radius: 8px; padding: 9px 12px; font-size: .86rem; }
+.note.info { background: var(--info-bg); color: var(--info-fg); }
+.note.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.note.err { background: var(--err-bg); color: var(--err-fg); }
+
+.levels { border: 1px dashed var(--line); border-radius: 8px; padding: 12px 14px; font-size: .86rem; color: var(--muted); }
+footer { font-size: .76rem; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
 <main>
-  <h1>ทดสอบเรียก endpoint ของฮั่วเซ่งเฮงจากหน้า artifact</h1>
-  <p class="lead">กดปุ่มเดียวเพื่อเรียก 3 endpoint จากเบราว์เซอร์ของคุณ ดูว่าอ่านผลได้หรือถูกบล็อก ผลจะถูกเก็บไว้ 5 นาที กดซ้ำในช่วงนั้นจะไม่ยิงใหม่</p>
-
-  <button id="run" type="button">ทดสอบ</button>
-
-  <div id="verdict" class="verdict" aria-live="polite">ยังไม่ได้ทดสอบ</div>
-
-  <div class="rows" id="rows">
-    <div class="row" id="r0">
-      <div class="row-head"><span class="name">ราคาทองแท่ง 96.5% (HSH)</span><span class="pill" data-pill>รอ</span></div>
-      <div class="url">apicheckpricev3.huasengheng.com/api/values/getprice/</div>
-      <div class="detail" data-detail>-</div>
+  <header>
+    <div>
+      <h1>HSH Gold Board</h1>
+      <p class="sub">ราคาทองฮั่วเซ่งเฮง</p>
     </div>
-    <div class="row" id="r1">
-      <div class="row-head"><span class="name">สถานะตลาด</span><span class="pill" data-pill>รอ</span></div>
-      <div class="url">apicheckpricev3.huasengheng.com/api/values/GetMarketStatus</div>
-      <div class="detail" data-detail>-</div>
-    </div>
-    <div class="row" id="r2">
-      <div class="row-head"><span class="name">ทองคำ 99.99%</span><span class="pill" data-pill>รอ</span></div>
-      <div class="url">apigoldprice99.huasengheng.com/api/values</div>
-      <div class="detail" data-detail>-</div>
-    </div>
-  </div>
+    <span class="chip" id="market" data-state="unknown">สถานะตลาด: ไม่ทราบ</span>
+  </header>
 
-  <div class="actions">
-    <button id="copy" type="button" class="ghost" hidden>คัดลอกผล</button>
-    <span id="copied" class="note" aria-live="polite"></span>
-  </div>
+  <button id="go" type="button">อัปเดตราคา</button>
+  <p class="status" id="status" aria-live="polite"></p>
 
-  <p class="note">endpoint เหล่านี้ไม่ใช่ API ทางการของฮั่วเซ่งเฮง อาจเปลี่ยนหรือปิดได้โดยไม่แจ้ง ถ้าขึ้นว่าเรียกไม่ได้ จากหน้านี้แยกไม่ได้ว่าถูกบล็อกโดยหน้า artifact หรือโดยเซิร์ฟเวอร์ปลายทาง</p>
+  <section class="card" id="card965" aria-labelledby="h965">
+    <h2 id="h965">ทองคำแท่ง 96.5% (HSH965) <span class="tag">บาทละ 15.244 กรัม</span></h2>
+    <div class="pair">
+      <div class="cell"><span class="lbl">รับซื้อ</span><span class="num" id="buy965">-</span><span class="chg" id="buyChg965"></span></div>
+      <div class="cell"><span class="lbl">ขายออก</span><span class="num" id="sell965">-</span><span class="chg" id="sellChg965"></span></div>
+    </div>
+    <div class="meta">
+      <span id="spread965"></span>
+      <span id="time965">ยังไม่ได้ดึงข้อมูล</span>
+      <span class="ref" id="ref965"></span>
+    </div>
+  </section>
+
+  <section class="card small" id="card9999" aria-labelledby="h9999">
+    <h2 id="h9999">ทองคำ 99.99% <span class="tag">บาทละ</span></h2>
+    <div class="pair">
+      <div class="cell"><span class="lbl">รับซื้อ</span><span class="num" id="buy9999">-</span></div>
+      <div class="cell"><span class="lbl">ขายออก</span><span class="num" id="sell9999">-</span></div>
+    </div>
+    <div class="meta"><span id="time9999">ยังไม่ได้ดึงข้อมูล</span></div>
+  </section>
+
+  <div id="notices" aria-live="polite"></div>
+
+  <p class="levels">แนวรับ-แนวต้านเป็นบาท HSH ยังไม่แสดงในรุ่นนี้ ดูในสรุปเช้า 7:27 น.</p>
+
+  <footer>
+    <p>ข้อมูลมาจาก endpoint ที่หน้าเว็บ huasengheng.com ใช้อยู่ ไม่ใช่ API ทางการของฮั่วเซ่งเฮง อาจเปลี่ยนหรือปิดได้โดยไม่แจ้ง เว็บนี้ดึงเฉพาะตอนกดปุ่ม และไม่ดึงซ้ำภายใน 5 นาที</p>
+    <p>ข้อมูลประกอบการตัดสินใจ ไม่ใช่คำแนะนำการลงทุน</p>
+  </footer>
 </main>
 
 <script>
 (function () {
-  var ENDPOINTS = [
-    { url: "https://apicheckpricev3.huasengheng.com/api/values/getprice/", kind: "price" },
-    { url: "https://apicheckpricev3.huasengheng.com/api/values/GetMarketStatus", kind: "market" },
-    { url: "https://apigoldprice99.huasengheng.com/api/values", kind: "gold9999" }
-  ];
-  var COOLDOWN_MS = 5 * 60 * 1000;
-  var lastRun = 0;
-  var lastReport = "";
-  var runBtn = document.getElementById("run");
-  var copyBtn = document.getElementById("copy");
-  var verdict = document.getElementById("verdict");
+  "use strict";
 
-  function setRow(i, state, text) {
-    var row = document.getElementById("r" + i);
-    var pill = row.querySelector("[data-pill]");
-    pill.className = "pill" + (state === "ok" ? " ok" : state === "bad" ? " bad" : "");
-    pill.textContent = state === "ok" ? "อ่านได้" : state === "bad" ? "เรียกไม่ได้" : "กำลังเรียก";
-    row.querySelector("[data-detail]").textContent = text;
-  }
+  var API = {
+    price: "https://apicheckpricev3.huasengheng.com/api/values/getprice/",
+    market: "https://apicheckpricev3.huasengheng.com/api/values/GetMarketStatus",
+    gold9999: "https://apigoldprice99.huasengheng.com/api/values"
+  };
+  var COOLDOWN_MS = 5 * 60 * 1000;      // ไม่ยิงซ้ำภายใน 5 นาที
+  var STALE_MARKET_ON_MS = 15 * 60 * 1000;
+  var TOO_OLD_MS = 24 * 60 * 60 * 1000; // เก่ากว่า 1 วัน ห้ามใช้เป็นราคาปัจจุบัน
+  var FETCH_TIMEOUT_MS = 10000;
+  var LS_KEY = "hsh-gold-board-v1";
 
-  function summarize(kind, data) {
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { lastFetch: 0, lastAttempt: 0, parts: {}, market: null, errors: {}, fromCache: false };
+
+  // ---------- storage (ใช้ได้หรือไม่ก็ได้) ----------
+  function load() {
     try {
-      if (kind === "price") {
-        var arr = Array.isArray(data) ? data : [];
-        var h = arr.filter(function (x) { return x && x.GoldType === "HSH"; })[0];
-        if (!h) return "อ่านได้ แต่ไม่พบรายการ HSH ในผล (รูปแบบอาจเปลี่ยน) จำนวนรายการ: " + arr.length;
-        return "รับซื้อ " + h.Buy + " · ขายออก " + h.Sell + " · อัปเดต " + (h.StrTimeUpdate || h.TimeUpdate);
+      var raw = localStorage.getItem(LS_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      if (s && typeof s === "object" && s.parts) {
+        state.lastFetch = Number(s.lastFetch) || 0;
+        state.lastAttempt = Number(s.lastAttempt) || state.lastFetch;
+        state.parts = s.parts || {};
+        state.market = s.market || null;
+        state.fromCache = true;
       }
-      if (kind === "market") {
-        return "MarketStatus: " + (data && data.MarketStatus);
-      }
-      if (kind === "gold9999") {
-        var d = Array.isArray(data) ? data[0] : data;
-        return "รับซื้อ " + (d && d.Buy) + " · ขายออก " + (d && d.Sell) + " · อัปเดต " + (d && d.TimeUpdate);
-      }
-    } catch (e) {}
-    return "อ่านได้ แต่แปลงผลไม่ได้";
+    } catch (e) { /* ไม่เป็นไร */ }
   }
-
-  async function callOne(ep, i) {
-    var t0 = performance.now();
+  function save() {
     try {
-      var res = await fetch(ep.url, { method: "GET", cache: "no-store" });
-      var ms = Math.round(performance.now() - t0);
-      if (!res.ok) {
-        setRow(i, "bad", "เซิร์ฟเวอร์ตอบ HTTP " + res.status + " (" + ms + " ms)");
-        return { ok: false, line: ep.url + " → HTTP " + res.status };
-      }
-      var data = await res.json();
-      var s = summarize(ep.kind, data);
-      setRow(i, "ok", s + " (" + ms + " ms)");
-      return { ok: true, line: ep.url + " → OK " + s };
-    } catch (e) {
-      var ms2 = Math.round(performance.now() - t0);
-      var msg = (e && e.name ? e.name : "Error") + ": " + (e && e.message ? e.message : "") + " (" + ms2 + " ms)";
-      setRow(i, "bad", msg);
-      return { ok: false, line: ep.url + " → FAIL " + msg };
-    }
+      localStorage.setItem(LS_KEY, JSON.stringify({ lastFetch: state.lastFetch, lastAttempt: state.lastAttempt, parts: state.parts, market: state.market }));
+    } catch (e) { /* ไม่เป็นไร */ }
   }
 
-  async function run() {
+  // ---------- helpers ----------
+  function num(v) {
+    var n = Number(String(v).replace(/,/g, "").trim());
+    return isFinite(n) && String(v).trim() !== "" ? n : NaN;
+  }
+  function fmt(n) { return isFinite(n) ? n.toLocaleString("en-US") : "-"; }
+  // เวลาจาก HSH ไม่มีโซนเวลา ถือเป็นเวลาไทย (UTC+7)
+  function parseThaiTime(s) {
+    if (!s) return NaN;
+    var str = String(s);
+    if (!/[zZ]|[+-]\d\d:?\d\d$/.test(str)) str += "+07:00";
+    return new Date(str).getTime();
+  }
+  var dtf = new Intl.DateTimeFormat("th-TH", { timeZone: "Asia/Bangkok", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  function fmtTime(ms) { return isFinite(ms) ? dtf.format(new Date(ms)) : "ไม่ทราบเวลา"; }
+  function ageText(ms) {
+    if (!isFinite(ms)) return "";
+    var d = Date.now() - ms;
+    if (d < 0) d = 0;
+    var m = Math.floor(d / 60000);
+    if (m < 1) return "เมื่อสักครู่";
+    if (m < 60) return m + " นาทีที่แล้ว";
+    var h = Math.floor(m / 60);
+    if (h < 24) return h + " ชม. " + (m % 60) + " นาทีที่แล้ว";
+    return Math.floor(h / 24) + " วันที่แล้ว";
+  }
+  function setChange(el, v) {
+    el.className = "chg";
+    if (!isFinite(v)) { el.textContent = ""; return; }
+    if (v > 0) { el.classList.add("up"); el.textContent = "▲ " + fmt(v); }
+    else if (v < 0) { el.classList.add("down"); el.textContent = "▼ " + fmt(Math.abs(v)); }
+    else { el.textContent = "– 0"; }
+  }
+
+  function fetchJson(url) {
+    var ctrl = new AbortController();
+    var t = setTimeout(function () { ctrl.abort(); }, FETCH_TIMEOUT_MS);
+    return fetch(url, { method: "GET", cache: "no-store", signal: ctrl.signal })
+      .then(function (res) {
+        clearTimeout(t);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .catch(function (e) {
+        clearTimeout(t);
+        if (e && e.name === "AbortError") throw new Error("หมดเวลา");
+        throw e;
+      });
+  }
+
+  // ---------- แปลงผล (ตรวจรูปแบบ ไม่เดาตัวเลข) ----------
+  function parsePrice(data) {
+    var arr = Array.isArray(data) ? data : [];
+    function find(t) { return arr.filter(function (x) { return x && x.GoldType === t; })[0]; }
+    var h = find("HSH");
+    if (!h) throw new Error("ไม่พบรายการ HSH ในผล (รูปแบบข้อมูลอาจเปลี่ยน)");
+    var out = { buy: num(h.Buy), sell: num(h.Sell), buyChange: num(h.BuyChange), sellChange: num(h.SellChange), time: parseThaiTime(h.TimeUpdate), fetchedAt: Date.now() };
+    if (!isFinite(out.buy) || !isFinite(out.sell)) throw new Error("อ่านราคาไม่ได้ (รูปแบบข้อมูลอาจเปลี่ยน)");
+    var r = find("REF");
+    var ref = r ? { buy: num(r.Buy), sell: num(r.Sell), time: parseThaiTime(r.TimeUpdate) } : null;
+    return { hsh: out, ref: ref && isFinite(ref.buy) && isFinite(ref.sell) ? ref : null };
+  }
+  function parseMarket(data) {
+    var s = data && data.MarketStatus;
+    if (s !== "ON" && s !== "OFF") throw new Error("อ่านสถานะตลาดไม่ได้");
+    return s;
+  }
+  function parse9999(data) {
+    var d = Array.isArray(data) ? data[0] : data;
+    var out = { buy: num(d && d.Buy), sell: num(d && d.Sell), time: parseThaiTime(d && d.TimeUpdate), fetchedAt: Date.now() };
+    if (!isFinite(out.buy) || !isFinite(out.sell)) throw new Error("อ่านราคาไม่ได้ (รูปแบบข้อมูลอาจเปลี่ยน)");
+    return out;
+  }
+
+  // ---------- ดึงข้อมูล ----------
+  var loading = false;
+  function run() {
+    if (loading) return;
+    var left = COOLDOWN_MS - (Date.now() - state.lastAttempt);
+    if (state.lastAttempt && left > 0) { render(); return; }
+    loading = true;
+    state.lastAttempt = Date.now();
+    state.errors = {};
+    $("go").disabled = true;
+    $("go").textContent = "กำลังดึงราคา...";
+    Promise.allSettled([fetchJson(API.price), fetchJson(API.market), fetchJson(API.gold9999)]).then(function (rs) {
+      var names = ["ราคา 96.5%", "สถานะตลาด", "ทอง 99.99%"];
+      var parsers = [
+        function (d) { var p = parsePrice(d); state.parts.hsh = p.hsh; state.parts.ref = p.ref; },
+        function (d) { state.market = parseMarket(d); state.parts.marketAt = Date.now(); },
+        function (d) { state.parts.g9999 = parse9999(d); }
+      ];
+      rs.forEach(function (r, i) {
+        try {
+          if (r.status !== "fulfilled") throw r.reason || new Error("ดึงไม่ได้");
+          parsers[i](r.value);
+        } catch (e) {
+          state.errors[names[i]] = (e && e.message) ? e.message : "ดึงไม่ได้";
+        }
+      });
+      var anyOk = Object.keys(state.errors).length < 3;
+      if (anyOk) state.lastFetch = Date.now();
+      state.fromCache = false;
+      loading = false;
+      save();
+      render();
+    });
+  }
+
+  // ---------- แสดงผล ----------
+  function addNote(box, cls, text) {
+    var p = document.createElement("p");
+    p.className = "note " + cls;
+    p.textContent = text;
+    box.appendChild(p);
+  }
+
+  function render() {
     var now = Date.now();
-    if (lastRun && now - lastRun < COOLDOWN_MS) {
-      var left = Math.ceil((COOLDOWN_MS - (now - lastRun)) / 1000);
-      verdict.textContent = "แสดงผลที่เก็บไว้ (ยิงใหม่ได้อีก " + left + " วินาที)";
-      return;
-    }
-    lastRun = now;
-    runBtn.disabled = true;
-    verdict.className = "verdict";
-    verdict.textContent = "กำลังทดสอบ...";
-    for (var i = 0; i < ENDPOINTS.length; i++) setRow(i, "wait", "-");
-    var results = await Promise.all(ENDPOINTS.map(callOne));
-    var okCount = results.filter(function (r) { return r.ok; }).length;
-    if (okCount === results.length) {
-      verdict.className = "verdict ok";
-      verdict.textContent = "ผ่านทั้ง 3 endpoint หน้า artifact เรียกข้ามโดเมนไปฮั่วเซ่งเฮงได้";
-    } else if (okCount === 0) {
-      verdict.className = "verdict bad";
-      verdict.textContent = "ไม่ผ่านทั้ง 3 endpoint หน้า artifact เรียกไม่ได้ ต้องใช้ที่โฮสต์อื่นหรือมีตัวกลาง";
+    var P = state.parts;
+    var notices = $("notices");
+    notices.textContent = "";
+
+    // ตลาด
+    var chip = $("market");
+    if (state.market === "ON") { chip.dataset.state = "on"; chip.textContent = "ตลาดเปิด"; }
+    else if (state.market === "OFF") { chip.dataset.state = "off"; chip.textContent = "ตลาดปิด"; }
+    else { chip.dataset.state = "unknown"; chip.textContent = "สถานะตลาด: ไม่ทราบ"; }
+
+    // 96.5%
+    var h = P.hsh;
+    var hStale = false;
+    if (h) {
+      $("buy965").textContent = fmt(h.buy);
+      $("sell965").textContent = fmt(h.sell);
+      setChange($("buyChg965"), h.buyChange);
+      setChange($("sellChg965"), h.sellChange);
+      $("spread965").textContent = "ส่วนต่างรับซื้อ-ขายออก " + fmt(h.sell - h.buy) + " บาท";
+      var age = now - h.time;
+      var t = $("time965");
+      t.textContent = "";
+      var a = document.createElement("span");
+      a.textContent = "ข้อมูล ณ " + fmtTime(h.time) + " (" + ageText(h.time) + ")";
+      t.appendChild(a);
+      if (isFinite(age) && age > TOO_OLD_MS) {
+        hStale = true;
+        addNote(notices, "err", "ราคา HSH 96.5% เก่ากว่า 1 วัน ห้ามใช้เป็นราคาปัจจุบัน");
+      } else if (state.market === "ON" && isFinite(age) && age > STALE_MARKET_ON_MS) {
+        hStale = true;
+        addNote(notices, "warn", "ตลาดเปิดอยู่ แต่ราคา HSH 96.5% ไม่ได้อัปเดตมา " + Math.floor(age / 60000) + " นาที ข้อมูลอาจค้าง");
+      }
+      if (!isFinite(h.time)) addNote(notices, "warn", "ไม่พบเวลาอัปเดตของราคา 96.5% ตรวจความสดของข้อมูลไม่ได้");
     } else {
-      verdict.className = "verdict bad";
-      verdict.textContent = "ผ่าน " + okCount + " จาก 3 endpoint ดูรายละเอียดด้านล่าง";
+      ["buy965", "sell965"].forEach(function (id) { $(id).textContent = "-"; });
+      setChange($("buyChg965"), NaN); setChange($("sellChg965"), NaN);
+      $("spread965").textContent = "";
+      $("time965").textContent = "ยังไม่มีข้อมูล กดอัปเดตราคา";
     }
-    lastReport = "ทดสอบ " + new Date().toISOString() + "\n" + results.map(function (r) { return r.line; }).join("\n");
-    copyBtn.hidden = false;
-    runBtn.disabled = false;
+    var ref = P.ref;
+    $("ref965").textContent = "";
+    if (ref) {
+      var rs = document.createElement("span");
+      rs.append("ราคาสมาคมค้าทองคำ (อ้างอิง) ");
+      var rn = document.createElement("span");
+      rn.className = "n";
+      rn.textContent = fmt(ref.buy) + " / " + fmt(ref.sell);
+      rs.appendChild(rn);
+      rs.append(" · " + fmtTime(ref.time));
+      $("ref965").appendChild(rs);
+    }
+
+    // 99.99%
+    var g = P.g9999;
+    if (g) {
+      $("buy9999").textContent = fmt(g.buy);
+      $("sell9999").textContent = fmt(g.sell);
+      $("time9999").textContent = "ข้อมูล ณ " + fmtTime(g.time) + " (" + ageText(g.time) + ")";
+      if (isFinite(now - g.time) && now - g.time > TOO_OLD_MS) addNote(notices, "err", "ราคาทอง 99.99% เก่ากว่า 1 วัน ห้ามใช้เป็นราคาปัจจุบัน");
+    } else {
+      $("buy9999").textContent = "-"; $("sell9999").textContent = "-";
+      $("time9999").textContent = "ยังไม่มีข้อมูล กดอัปเดตราคา";
+    }
+
+    // ข้อความเตือน
+    var errKeys = Object.keys(state.errors);
+    if (errKeys.length) {
+      addNote(notices, "err", "ดึงข้อมูลไม่ได้: " + errKeys.map(function (k) { return k + " (" + state.errors[k] + ")"; }).join(", ") + " endpoint ไม่ใช่ API ทางการ อาจเปลี่ยนหรือปิดไปแล้ว ค่าที่เห็นอาจเป็นค่าเก่าจากครั้งก่อน ดูเวลาข้อมูลของแต่ละช่อง");
+    }
+    if (state.market === "OFF" && h && !hStale) addNote(notices, "info", "ตลาดปิดอยู่ ราคาที่เห็นคือราคาล่าสุดก่อนปิด ราคาตอนเปิดอาจต่างไปตามราคาทองโลก");
+    if (state.market === null && state.lastFetch) addNote(notices, "warn", "อ่านสถานะตลาดไม่ได้ จึงตัดสินไม่ได้ว่าราคาค้างหรือไม่");
+    if (state.fromCache && (h || g)) addNote(notices, "info", "กำลังแสดงข้อมูลที่เก็บไว้จากครั้งก่อน (ดึงเมื่อ " + fmtTime(state.lastFetch) + ") กดอัปเดตราคาเพื่อดึงใหม่");
+
+    // ปุ่มและสถานะ
+    tick();
   }
 
-  runBtn.addEventListener("click", run);
+  function tick() {
+    var go = $("go");
+    if (loading) return;
+    var left = COOLDOWN_MS - (Date.now() - state.lastAttempt);
+    var okText = state.lastFetch
+      ? "ดึงข้อมูลสำเร็จล่าสุดเมื่อ " + fmtTime(state.lastFetch) + " (" + ageText(state.lastFetch) + ")"
+      : (state.lastAttempt ? "ยังดึงข้อมูลไม่สำเร็จ" : "กดปุ่มเพื่อดึงราคาล่าสุด");
+    if (state.lastAttempt && left > 0) {
+      var s = Math.ceil(left / 1000);
+      go.disabled = true;
+      go.textContent = "ดึงใหม่ได้อีก " + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+    } else {
+      go.disabled = false;
+      go.textContent = "อัปเดตราคา";
+    }
+    $("status").textContent = okText;
+  }
 
-  copyBtn.addEventListener("click", function () {
-    var out = document.getElementById("copied");
-    function fallback() { out.textContent = "คัดลอกไม่ได้ในหน้านี้ ให้จดผลด้านบนแทน"; }
-    try {
-      navigator.clipboard.writeText(lastReport).then(function () { out.textContent = "คัดลอกแล้ว"; }, fallback);
-    } catch (e) { fallback(); }
-  });
+  $("go").addEventListener("click", run);
+  load();
+  render();
+  setInterval(function () { if (!loading) { render(); } }, 15000);
+  setInterval(tick, 1000);
 })();
 </script>
-
 </body>
 </html>
